@@ -1,6 +1,8 @@
 import express from "express"
 import { Tickets } from "../models/Tickets.js";
 import { IsAuthenticated } from "../auth/authenticate.js";
+import moment from "moment";
+import { Panel } from "../models/Panel.js";
 
 const router = express.Router()
 
@@ -208,7 +210,40 @@ router.put('/update/:id', IsAuthenticated, async (req, res) => {
     }
 })
 
+router.get('/panel-id-in-week/:gameId', IsAuthenticated, async (req, res) => {
+    try {
+        const { gameId } = req.params;
+        const today = moment(); // current date
 
+        const panelData = await Panel.findOne({ gameId });
+        if (!panelData) {
+            return res.status(404).json({ success: false, message: 'Game not found' });
+        }
+
+        const foundPanel = panelData.panel.find(pnl => {
+            const [start, end] = pnl.date.split(' To ');
+            const startDate = moment(start, 'DD.MM.YYYY');
+            const endDate = moment(end, 'DD.MM.YYYY');
+
+            return today.isBetween(startDate, endDate, 'day', '[]'); // inclusive range
+        });
+
+        if (!foundPanel) {
+            return res.status(404).json({ success: false, message: 'No panel found for this week' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            panelId: foundPanel.id,
+            dateRange: foundPanel.date,
+        });
+
+    } catch (err) {
+        console.error("Error in /panel-id-in-week:", err);
+        console.log(err)
+        res.status(500).json({ success: false, message: 'Server error', err: err.message });
+    }
+});
 
 
 export default router

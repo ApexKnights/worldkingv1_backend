@@ -8,6 +8,7 @@ import ticketRouter from './routes/tickets.js'
 import userRouter from './routes/user.js'
 import panelRouter from "./routes/panel.js"
 import noticeRouter from "./routes/notice.js"
+import { startAutoPanelCron } from "./cron/autoPanel.js"
 
 
 
@@ -50,6 +51,8 @@ app.get("/", async (req, res) => {
     })
 })
 
+
+startAutoPanelCron()
 
 
 
