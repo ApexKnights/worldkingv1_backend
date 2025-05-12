@@ -20,7 +20,7 @@ export const startAutoPanelCron = () => {
                 const endDate = moment(endDateStr, "DD.MM.YYYY");
                 const today = moment();
 
-                if (today.isAfter(endDate)) {
+                if (today.isSameOrAfter(endDate)) {
                     const nextStart = endDate.clone().add(1, 'days');
                     const nextEnd = nextStart.clone().add(6, 'days');
                     const nextPanelDate = `${nextStart.format("DD.MM.YYYY")} To ${nextEnd.format("DD.MM.YYYY")}`;
